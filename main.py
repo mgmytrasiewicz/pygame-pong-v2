@@ -1,28 +1,30 @@
 import pygame
+from config import WIDTH, HEIGHT
+from core.game import Game
 
-# Initialize Pygame
-pygame.init()
+# Main function to run the game
+def main():
 
-# Set up display
-BORDER = 10
-WIDTH, HEIGHT = 800, 600
+    # Initialize Pygame
+    pygame.init()
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-screen.fill(pygame.Color("black"))
+    # Configuration parameters
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("The Pong Game")
 
-pygame.display.set_caption("The Pong Game")
+    game = Game(screen)
 
-pygame.draw.rect(screen, pygame.Color("white"),\
-                 pygame.Rect(0, 0, WIDTH, BORDER))  # Top border
-pygame.draw.rect(screen, pygame.Color("white"),\
-                    pygame.Rect(0, HEIGHT - BORDER, WIDTH, BORDER))  # Bottom border
-pygame.draw.rect(screen, pygame.Color("white"),\
-                    pygame.Rect(0, 0, BORDER, HEIGHT))  # Left border
+    # Main loop to keep the window open
+    running = True
+    while running:
+        e = pygame.event.poll()
+        if e.type == pygame.QUIT:
+            running = False
+        
+        game.update()
+        pygame.display.flip()
 
-pygame.display.flip()
-while True:
-    e = pygame.event.poll()
-    if e.type == pygame.QUIT:
-        break
+    pygame.quit()
 
-pygame.quit()
+if __name__ == "__main__":
+    main()
