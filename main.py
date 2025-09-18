@@ -1,5 +1,5 @@
 import pygame
-from config import SCREEN_WIDTH, SCREEN_HEIGHT
+from config import SCREEN_WIDTH, SCREEN_HEIGHT, FPS
 from core.game import Game
 
 # Main function to run the game
@@ -12,22 +12,21 @@ def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("The Pong Game")
 
+    clock = pygame.time.Clock()
     game = Game(screen)
 
     # Main loop to keep the window open
     running = True
     while running:
-        for e in pygame.event.get():
-            if e.type == pygame.QUIT:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 running = False
-
-            # Start the ball movement on mouse click
-            if e.type == pygame.MOUSEBUTTONDOWN:
-                game.ball.moving = True
+            game.handle_event(event)
         
         game.update()
         game.render()
         pygame.display.flip()
+        clock.tick(FPS)  # Limit to 60 FPS
 
     pygame.quit()
 

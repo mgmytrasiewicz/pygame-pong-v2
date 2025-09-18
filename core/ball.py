@@ -1,5 +1,6 @@
 import pygame
-from config import BALL_RADIUS, WHITE, BLACK, SCREEN_WIDTH, SCREEN_HEIGHT, BORDER, PADDLE_WIDTH, PADDLE_HEIGHT
+from config import BALL_RADIUS, BALL_OFFSET, SCREEN_WIDTH, SCREEN_HEIGHT, BORDER, PADDLE_HEIGHT
+from core import paddle
 
 # Ball class definition
 class Ball:
@@ -15,13 +16,26 @@ class Ball:
     def draw(self, color):
         pygame.draw.circle(self.surface, color, (self.x, self.y), BALL_RADIUS)
 
+    @property
+    def rect(self):
+        return pygame.Rect(self.x - BALL_RADIUS, self.y - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2)
+    
+    def reset(self, paddle):
+        # Reset ball to front of paddle and stop movement.
+        self.moving = False
+        self.y = paddle.y + PADDLE_HEIGHT // 2
+        self.x = paddle.x - BALL_RADIUS - BALL_OFFSET
+
     def update(self, paddle):
         if not self.moving:
             # Stick to the front of the paddle
-            self.y = paddle.y + PADDLE_HEIGHT // 2
-            self.x = paddle.x - BALL_RADIUS - 1  # Just in front of paddle
+            self.reset(paddle)
             return
         
+        if self.x > SCREEN_WIDTH:
+            self.reset(paddle)
+            return
+
         newx = self.x + self.vx
         newy = self.y + self.vy
 
@@ -30,11 +44,8 @@ class Ball:
             self.vx = -self.vx
         elif newy - BALL_RADIUS < BORDER or newy + BALL_RADIUS > SCREEN_HEIGHT - BORDER:
             self.vy = -self.vy
-        elif newx + BALL_RADIUS >= SCREEN_WIDTH + PADDLE_WIDTH \
-            and abs(newy - paddle.y) <= PADDLE_HEIGHT // 2:
+        elif self.rect.colliderect(paddle.rect):
             self.vx = -self.vx  # Bounce off the paddle
      
-        #self._draw(BLACK)  # Erase the ball by drawing it in black
         self.x += self.vx
         self.y += self.vy
-        #self._draw(WHITE)  # Draw the ball in white
