@@ -1,9 +1,13 @@
 import pygame
-from config import BALL_RADIUS, BALL_OFFSET, SCREEN_WIDTH, SCREEN_HEIGHT, BORDER, PADDLE_HEIGHT
-from core import paddle
+import config
 
 # Ball class definition
 class Ball:
+    """
+    Represents the ball in the Pong game.
+    Manages position, movement, collision logic with paddle/walls,
+    and plays corresponding sound effects.
+    """
 
     def __init__(self, x, y, vx, vy, surface):
         self.x = x
@@ -18,17 +22,17 @@ class Ball:
         self.sound_miss = pygame.mixer.Sound("assets/sounds/game-over.wav")
 
     def draw(self, color):
-        pygame.draw.circle(self.surface, color, (self.x, self.y), BALL_RADIUS)
+        pygame.draw.circle(self.surface, color, (self.x, self.y), config.BALL_RADIUS)
 
     @property
     def rect(self):
-        return pygame.Rect(self.x - BALL_RADIUS, self.y - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2)
-    
+        return pygame.Rect(self.x - config.BALL_RADIUS, self.y - config.BALL_RADIUS, config.BALL_RADIUS * 2, config.BALL_RADIUS * 2)
+
     def reset(self, paddle):
         # Reset ball to front of paddle and stop movement.
         self.moving = False
-        self.y = paddle.y + PADDLE_HEIGHT // 2
-        self.x = paddle.x - BALL_RADIUS - BALL_OFFSET
+        self.y = paddle.y + config.PADDLE_HEIGHT // 2
+        self.x = paddle.x - config.BALL_RADIUS - config.BALL_OFFSET
 
     def update(self, paddle):
         if not self.moving:
@@ -36,24 +40,36 @@ class Ball:
             self.reset(paddle)
             return
         
-        if self.x > SCREEN_WIDTH:
-            self.reset(paddle)
-            self.sound_miss.play()
-            return
-
+        # Calculate new position
         newx = self.x + self.vx
         newy = self.y + self.vy
 
-        # Check for collisions with the walls
-        if newx - BALL_RADIUS < BORDER:
-            self.vx = -self.vx
-            self.sound_wall.play()
-        elif newy - BALL_RADIUS < BORDER or newy + BALL_RADIUS > SCREEN_HEIGHT - BORDER:
-            self.vy = -self.vy
-            self.sound_wall.play()
-        elif self.rect.colliderect(paddle.rect):
+        # Construct future rect for accurate collision detection
+        future_rect = pygame.Rect(
+            newx - config.BALL_RADIUS,
+            newy - config.BALL_RADIUS,
+            config.BALL_RADIUS * 2,
+            config.BALL_RADIUS * 2
+        )
+
+        # Check for collision with the paddle
+        if future_rect.colliderect(paddle.rect):
             self.vx = -self.vx  # Bounce off the paddle
             self.sound_paddle.play()
+            return "BOUNCE"
+
+        # Check for collisions with the walls
+        elif newx - config.BALL_RADIUS < config.BORDER:
+            self.vx = -self.vx
+            self.sound_wall.play()
+        elif newy - config.BALL_RADIUS < config.BORDER or newy + config.BALL_RADIUS > config.SCREEN_HEIGHT - config.BORDER:
+            self.vy = -self.vy
+            self.sound_wall.play()
+
+        elif self.x - config.BALL_RADIUS > config.SCREEN_WIDTH:
+            self.reset(paddle)
+            self.sound_miss.play()
+            return "MISS"
      
         self.x += self.vx
         self.y += self.vy

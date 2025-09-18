@@ -1,5 +1,5 @@
 import pygame
-from config import SCREEN_WIDTH, SCREEN_HEIGHT, FPS
+import config
 from core.game import Game
 
 # Main function to run the game
@@ -9,7 +9,7 @@ def main():
     pygame.init()
 
     # Configuration parameters
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
     pygame.display.set_caption("The Pong Game")
 
     clock = pygame.time.Clock()
@@ -26,7 +26,7 @@ def main():
         game.update()
         game.render()
         pygame.display.flip()
-        clock.tick(FPS)  # Limit to 60 FPS
+        clock.tick(config.FPS)  # Limit to 60 FPS
 
     pygame.quit()
 
