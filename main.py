@@ -4,6 +4,21 @@ from core.game import Game
 
 # Main function to run the game
 def main():
+    """
+    Initialize and run the Pong game loop.
+
+    This function sets up the Pygame environment, creates the game window,
+    initializes the Game object, and runs the main game loop. It handles event
+    processing, updating game state, rendering frames, and managing frame rate.
+
+    The loop continues until the user quits the game window.
+
+    Raises:
+        SystemExit: When the user closes the game window.
+
+    Example:
+        >>> main()  # Starts the Pong game
+    """
 
     # Initialize Pygame
     pygame.init()
@@ -11,7 +26,6 @@ def main():
     # Configuration parameters
     screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
     pygame.display.set_caption("The Pong Game")
-
     clock = pygame.time.Clock()
     game = Game(screen)
 
@@ -26,7 +40,7 @@ def main():
         game.update()
         game.render()
         pygame.display.flip()
-        clock.tick(config.FPS)  # Limit to 60 FPS
+        clock.tick(config.FPS)
 
     pygame.quit()
 

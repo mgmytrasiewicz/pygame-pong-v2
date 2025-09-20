@@ -11,6 +11,7 @@ class Game:
     """
 
     def __init__(self, surface):
+        # Initialize game objects
         self.surface = surface
         self.ball = Ball(config.SCREEN_WIDTH - config.BALL_RADIUS - config.PADDLE_WIDTH, config.SCREEN_HEIGHT // 2, -config.BALL_SPEED_X, -config.BALL_SPEED_Y, surface)
         self.paddle = Paddle(config.SCREEN_HEIGHT // 2 - config.PADDLE_HEIGHT // 2, surface)
@@ -18,13 +19,17 @@ class Game:
         self.state = "WELCOME"  # <- Start at welcome screen
         self.score = 0
         self.lives = 3
+        self.sound_welcome = pygame.mixer.Sound("assets/sounds/start-game.wav")
+        self.welcome_played = False
 
     def _draw_borders(self):
+        # Draw the game borders
         pygame.draw.rect(self.surface, config.WHITE, pygame.Rect(0, 0, config.SCREEN_WIDTH, config.BORDER))  # Top border
         pygame.draw.rect(self.surface, config.WHITE, pygame.Rect(0, config.SCREEN_HEIGHT - config.BORDER, config.SCREEN_WIDTH, config.BORDER))  # Bottom border
         pygame.draw.rect(self.surface, config.WHITE, pygame.Rect(0, 0, config.BORDER, config.SCREEN_HEIGHT))  # Left border
 
     def update(self):
+        # Update game objects
         if self.state == "WELCOME":
             return  # No updates in welcome state        
         self.paddle.update()
@@ -43,15 +48,22 @@ class Game:
 
 
     def reset_game(self):
+        # Reset game to initial state
         self.score = 0
         self.lives = 3
         self.ball.reset(self.paddle)
 
     def render(self):
+        # Render the game objects and UI
+
         # Fill screen with black
         self.surface.fill(config.BLACK)
 
+        # State-based rendering
         if self.state == "WELCOME":
+            if not self.welcome_played:
+                self.sound_welcome.play()
+                self.welcome_played = True            
             self._render_welcome()
             return
         
@@ -73,6 +85,7 @@ class Game:
             self.surface.blit(text, rect)
 
     def handle_event(self, event):
+        # Handle input events
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.state == "WELCOME":
                 self.state = "PLAYING"
@@ -84,6 +97,7 @@ class Game:
                 self.state = "WELCOME"        
 
     def _render_welcome(self):
+        # Render the welcome screen
         # Larger font for the title
         title_font = pygame.font.SysFont('Arial', 64, bold=True)
         # Smaller font for instructions
@@ -99,6 +113,7 @@ class Game:
         self.surface.blit(instruction, instruction_rect)
 
     def _render_game_over(self):
+        # Render the game over screen
         game_over_text = self.font.render("Game Over", True, config.WHITE)
         score_text = self.font.render(f"Final Score: {self.score}", True, config.WHITE)
         restart_text = self.font.render("Click to Restart", True, config.WHITE)
@@ -112,9 +127,9 @@ class Game:
         self.surface.blit(restart_text, restart_rect)
 
     def _render_hud(self):
+        # Render the heads-up display (score and lives)
         score_text = self.font.render(f"Score: {self.score}", True, config.WHITE)
         lives_text = self.font.render(f"Lives: {self.lives}", True, config.WHITE)
 
         self.surface.blit(score_text, (config.BORDER + 10, config.BORDER + 10))
         self.surface.blit(lives_text, (config.SCREEN_WIDTH - lives_text.get_width() - config.BORDER - 10, config.BORDER + 10))
-

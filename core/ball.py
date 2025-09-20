@@ -10,6 +10,7 @@ class Ball:
     """
 
     def __init__(self, x, y, vx, vy, surface):
+        # Initialize ball properties
         self.x = x
         self.y = y
         self.vx = vx
@@ -22,9 +23,11 @@ class Ball:
         self.sound_miss = pygame.mixer.Sound("assets/sounds/game-over.wav")
 
     def draw(self, color):
+        # Draw the ball as a circle
         pygame.draw.circle(self.surface, color, (self.x, self.y), config.BALL_RADIUS)
 
     @property
+    # Get the rectangular area of the ball for collision detection
     def rect(self):
         return pygame.Rect(self.x - config.BALL_RADIUS, self.y - config.BALL_RADIUS, config.BALL_RADIUS * 2, config.BALL_RADIUS * 2)
 
@@ -35,6 +38,7 @@ class Ball:
         self.x = paddle.x - config.BALL_RADIUS - config.BALL_OFFSET
 
     def update(self, paddle):
+        # Only move if in motion
         if not self.moving:
             # Stick to the front of the paddle
             self.reset(paddle)
@@ -66,6 +70,7 @@ class Ball:
             self.vy = -self.vy
             self.sound_wall.play()
 
+        # Check if the ball has gone past the paddle (missed)
         elif self.x - config.BALL_RADIUS > config.SCREEN_WIDTH:
             self.reset(paddle)
             self.sound_miss.play()
