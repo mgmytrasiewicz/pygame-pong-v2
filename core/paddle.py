@@ -4,8 +4,9 @@ import config
 # Paddle class definition
 class Paddle:
     """
-    Represents the player's paddle. Follows the vertical position of the mouse,
-    and prevents movement beyond screen borders.
+    Represents the player-controlled paddle.
+
+    Follows the vertical position of the mouse while staying within screen bounds.
     """
 
     def __init__(self, y, surface):

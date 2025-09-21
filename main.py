@@ -5,19 +5,13 @@ from core.game import Game
 # Main function to run the game
 def main():
     """
-    Initialize and run the Pong game loop.
+    Entry point for the Pong game.
 
-    This function sets up the Pygame environment, creates the game window,
-    initializes the Game object, and runs the main game loop. It handles event
-    processing, updating game state, rendering frames, and managing frame rate.
-
-    The loop continues until the user quits the game window.
+    Initializes Pygame, sets up the display and clock, and runs the main game loop.
+    Handles event polling, game state updates, rendering, and frame rate control.
 
     Raises:
-        SystemExit: When the user closes the game window.
-
-    Example:
-        >>> main()  # Starts the Pong game
+        SystemExit: If the user quits the game window.
     """
 
     # Initialize Pygame

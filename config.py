@@ -15,3 +15,9 @@ BALL_OFFSET = 1  # Distance from paddle when stationary
 
 # ==== PADDLE SETTINGS ====
 PADDLE_WIDTH, PADDLE_HEIGHT = 20, 80
+
+# ==== SOUNDS ====
+SOUND_WELCOME = "assets/sounds/start-game.wav"
+SOUND_PADDLE = "assets/sounds/rebound-paddle.wav"
+SOUND_WALL = "assets/sounds/rebound-wall.wav"
+SOUND_MISS = "assets/sounds/game-over.wav"

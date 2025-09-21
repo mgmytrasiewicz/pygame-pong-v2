@@ -5,8 +5,9 @@ import config
 class Ball:
     """
     Represents the ball in the Pong game.
-    Manages position, movement, collision logic with paddle/walls,
-    and plays corresponding sound effects.
+
+    Handles movement, collision detection with walls and paddle,
+    and plays sound effects for events like rebound and miss.
     """
 
     def __init__(self, x, y, vx, vy, surface):
@@ -18,9 +19,9 @@ class Ball:
         self.surface = surface
         self.moving = False # Ball starts stationary
 
-        self.sound_paddle = pygame.mixer.Sound("assets/sounds/rebound-paddle.wav")
-        self.sound_wall = pygame.mixer.Sound("assets/sounds/rebound-wall.wav")
-        self.sound_miss = pygame.mixer.Sound("assets/sounds/game-over.wav")
+        self.sound_paddle = pygame.mixer.Sound(config.SOUND_PADDLE)
+        self.sound_wall = pygame.mixer.Sound(config.SOUND_WALL)
+        self.sound_miss = pygame.mixer.Sound(config.SOUND_MISS)
 
     def draw(self, color):
         # Draw the ball as a circle
@@ -38,6 +39,17 @@ class Ball:
         self.x = paddle.x - config.BALL_RADIUS - config.BALL_OFFSET
 
     def update(self, paddle):
+        """
+        Update the ball's position based on current velocity.
+
+        Args:
+            paddle (Paddle): The player's paddle for collision detection.
+
+        Returns:
+            str: "BOUNCE" if it hits the paddle, "MISS" if it goes out of bounds,
+                None otherwise.
+        """
+        
         # Only move if in motion
         if not self.moving:
             # Stick to the front of the paddle
