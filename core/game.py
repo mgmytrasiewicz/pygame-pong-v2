@@ -68,7 +68,7 @@ class Game:
                 self.ball.reset(self.paddle)
 
 
-    def reset_game(self):
+    def _reset_game(self):
         # Reset game to initial state
         self.score = 0
         self.lives = 3
@@ -109,7 +109,7 @@ class Game:
         """
         Handle user input events.
 
-        - Mouse click starts the game or restarts after game over.
+        - Mouse click starts the game and restarts after miss or game over.
         """
 
         # Handle input events
@@ -120,7 +120,8 @@ class Game:
             elif self.state == GameState.PLAYING:
                 self.ball.moving = True
             elif self.state == GameState.GAME_OVER:
-                self.reset_game()
+                self.welcome_played = False
+                self._reset_game()
                 self.state = GameState.WELCOME
 
     def _render_welcome(self):
