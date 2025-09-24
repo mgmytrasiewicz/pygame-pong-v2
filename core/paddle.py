@@ -1,5 +1,7 @@
 import pygame
 import config
+import joblib
+import numpy as np
 
 # Paddle class definition
 class Paddle:
@@ -9,11 +11,17 @@ class Paddle:
     Follows the vertical position of the mouse while staying within screen bounds.
     """
 
-    def __init__(self, y, surface):
+    def __init__(self, y, surface, ball):
         # Initialize paddle properties
         self.x = config.SCREEN_WIDTH - config.PADDLE_WIDTH
         self.y = y
         self.surface = surface
+
+        self.ball = ball  # <--- store the instance
+
+        # Load trained model
+        self.model = joblib.load('./model/ml_model.pkl')
+        self.scaler = joblib.load('./model/scaler.pkl')
 
     @property
     # Get the rectangular area of the paddle for collision detection
@@ -26,8 +34,11 @@ class Paddle:
 
     def update(self):
         # Update paddle position based on mouse Y position
-        mouse_y = pygame.mouse.get_pos()[1]
-        newy = mouse_y - config.PADDLE_HEIGHT // 2
+        features = np.array([[self.ball.x, self.ball.y, self.ball.vx, self.ball.vy]])
+        features_scaled = self.scaler.transform(features)
+        predicted_y = self.model.predict(features_scaled)[0]
 
-        if newy >= config.BORDER and newy + config.PADDLE_HEIGHT <= config.SCREEN_HEIGHT - config.BORDER:
-            self.y = newy
+        # Clamp within bounds
+        predicted_y = max(config.BORDER, min(predicted_y, config.SCREEN_HEIGHT - config.PADDLE_HEIGHT - config.BORDER))
+
+        self.y = predicted_y

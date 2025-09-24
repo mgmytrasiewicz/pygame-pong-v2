@@ -22,7 +22,7 @@ class Game:
         # Initialize game objects
         self.surface = surface
         self.ball = Ball(config.SCREEN_WIDTH - config.BALL_RADIUS - config.PADDLE_WIDTH, config.SCREEN_HEIGHT // 2, -config.BALL_SPEED_X, -config.BALL_SPEED_Y, surface)
-        self.paddle = Paddle(config.SCREEN_HEIGHT // 2 - config.PADDLE_HEIGHT // 2, surface)
+        self.paddle = Paddle(config.SCREEN_HEIGHT // 2 - config.PADDLE_HEIGHT // 2, surface, self.ball)
         self.fonts = {
             "title": pygame.font.SysFont('Arial', 64, bold=True),
             "instruction": pygame.font.SysFont('Comic Sans MS', 32, italic=True),
@@ -126,7 +126,7 @@ class Game:
 
     def _render_welcome(self):
         # Render the welcome screen
-        title = self.fonts["title"].render("The Pong Game!", True, config.WHITE)
+        title = self.fonts["title"].render("The ML-Pong Game!", True, config.WHITE)
         instruction = self.fonts["instruction"].render("Click to Start", True, config.WHITE)
 
         title_rect = title.get_rect(center=(config.SCREEN_WIDTH//2, config.SCREEN_HEIGHT//2 - 30))
