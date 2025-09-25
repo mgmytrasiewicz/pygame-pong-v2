@@ -16,7 +16,6 @@ class Paddle:
         self.x = config.SCREEN_WIDTH - config.PADDLE_WIDTH
         self.y = y
         self.surface = surface
-
         self.ball = ball  # <--- store the instance
 
         # Load trained model
