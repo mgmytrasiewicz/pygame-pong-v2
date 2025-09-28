@@ -3,6 +3,7 @@ import config
 from core.ball import Ball
 from core.paddle import Paddle
 from enum import Enum, auto
+import joblib
 
 class GameState(Enum):
     WELCOME = auto()
@@ -33,6 +34,7 @@ class Game:
         self.lives = 3
         self.sound_welcome = pygame.mixer.Sound(config.SOUND_WELCOME)
         self.welcome_played = False
+        self.model_name = joblib.load('./model/ml_model.pkl').__class__.__name__
 
     def _draw_borders(self):
         # Draw the game borders
@@ -127,12 +129,15 @@ class Game:
     def _render_welcome(self):
         # Render the welcome screen
         title = self.fonts["title"].render("The ML-Pong Game!", True, config.WHITE)
+        model = self.fonts["default"].render(f"Model: {self.model_name}", True, config.WHITE)
         instruction = self.fonts["instruction"].render("Click to Start", True, config.WHITE)
 
-        title_rect = title.get_rect(center=(config.SCREEN_WIDTH//2, config.SCREEN_HEIGHT//2 - 30))
+        title_rect = title.get_rect(center=(config.SCREEN_WIDTH//2, config.SCREEN_HEIGHT//2 - 90))
+        model_rect = model.get_rect(center=(config.SCREEN_WIDTH//2, config.SCREEN_HEIGHT//2 - 30))
         instruction_rect = instruction.get_rect(center=(config.SCREEN_WIDTH//2, config.SCREEN_HEIGHT//2 + 30))
 
         self.surface.blit(title, title_rect)
+        self.surface.blit(model, model_rect)
         self.surface.blit(instruction, instruction_rect)
 
     def _render_game_over(self):
