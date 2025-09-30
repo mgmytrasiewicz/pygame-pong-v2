@@ -19,7 +19,7 @@ def main():
 
     # Configuration parameters
     screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
-    pygame.display.set_caption("The ML-Pong Game")
+    pygame.display.set_caption("The Pong Game v2.0")
     clock = pygame.time.Clock()
     game = Game(screen)
 
