@@ -23,15 +23,18 @@ class Game:
         # Initialize game objects
         self.surface = surface
         self.ball = Ball(config.SCREEN_WIDTH - config.BALL_RADIUS - config.PADDLE_WIDTH, config.SCREEN_HEIGHT // 2, -config.BALL_SPEED_X, -config.BALL_SPEED_Y, surface)
-        self.paddle = Paddle(config.SCREEN_HEIGHT // 2 - config.PADDLE_HEIGHT // 2, surface, self.ball)
+        self.right_paddle = Paddle(config.SCREEN_HEIGHT // 2 - config.PADDLE_HEIGHT // 2, is_ai=True, surface=surface, ball=self.ball)
+        self.left_paddle = Paddle(config.SCREEN_HEIGHT // 2 - config.PADDLE_HEIGHT // 2, is_ai=False, surface=surface, ball=self.ball)
         self.fonts = {
             "title": pygame.font.SysFont('Arial', 64, bold=True),
             "instruction": pygame.font.SysFont('Comic Sans MS', 32, italic=True),
             "default": pygame.font.SysFont(None, 36)
         }
         self.state = GameState.WELCOME  # <- Start at welcome screen
-        self.score = 0
-        self.lives = 3
+        self.left_score = 0
+        self.right_score = 0
+        self.left_lives = 3
+        self.right_lives = 3
         self.sound_welcome = pygame.mixer.Sound(config.SOUND_WELCOME)
         self.welcome_played = False
         self.model_name = joblib.load('./model/ml_model.pkl').__class__.__name__
@@ -40,7 +43,6 @@ class Game:
         # Draw the game borders
         pygame.draw.rect(self.surface, config.WHITE, pygame.Rect(0, 0, config.SCREEN_WIDTH, config.BORDER))  # Top border
         pygame.draw.rect(self.surface, config.WHITE, pygame.Rect(0, config.SCREEN_HEIGHT - config.BORDER, config.SCREEN_WIDTH, config.BORDER))  # Bottom border
-        pygame.draw.rect(self.surface, config.WHITE, pygame.Rect(0, 0, config.BORDER, config.SCREEN_HEIGHT))  # Left border
 
     def update(self):
         """
@@ -54,27 +56,36 @@ class Game:
         
         # Update game objects
         if self.state == GameState.WELCOME:
-            return  # No updates in welcome state        
-        self.paddle.update()
+            return  # No updates in welcome state
+        self.right_paddle.update()
+        self.left_paddle.update()
         # Capture ball return value (did bounce? or missed?)
-        result = self.ball.update(self.paddle)
+        result = self.ball.update(self.left_paddle, self.right_paddle)
 
-        if result == "BOUNCE":
-            self.score += 1
-
-        elif result == "MISS":
-            self.lives -= 1
-            if self.lives <= 0:
+        if result == "LEFT_MISS":
+            self.right_score += 1
+            self.left_lives -= 1
+            if self.left_lives <= 0:
                 self.state = GameState.GAME_OVER
             else:
-                self.ball.reset(self.paddle)
+                self.ball.reset(self.left_paddle)
+
+        elif result == "RIGHT_MISS":
+            self.left_score += 1
+            self.right_lives -= 1
+            if self.right_lives <= 0:
+                self.state = GameState.GAME_OVER
+            else:
+                self.ball.reset(self.right_paddle)
 
 
     def _reset_game(self):
         # Reset game to initial state
-        self.score = 0
-        self.lives = 3
-        self.ball.reset(self.paddle)
+        self.left_score = 0
+        self.right_score = 0
+        self.left_lives = 3
+        self.right_lives = 3
+        self.ball.reset(self.left_paddle)
 
     def render(self):
         # Render the game objects and UI
@@ -98,7 +109,8 @@ class Game:
         # Draw borders
         self._draw_borders()
         # Draw paddle and ball
-        self.paddle.draw(config.WHITE)
+        self.left_paddle.draw(config.WHITE)
+        self.right_paddle.draw(config.WHITE)
         self.ball.draw(config.WHITE)
         self._render_hud()
 
@@ -128,8 +140,8 @@ class Game:
 
     def _render_welcome(self):
         # Render the welcome screen
-        title = self.fonts["title"].render("The ML-Pong Game!", True, config.WHITE)
-        model = self.fonts["default"].render(f"Model: {self.model_name}", True, config.WHITE)
+        title = self.fonts["title"].render("The Pong Game v2.0!", True, config.WHITE)
+        model = self.fonts["default"].render("Human vs. AI", True, config.WHITE)
         instruction = self.fonts["instruction"].render("Click to Start", True, config.WHITE)
 
         title_rect = title.get_rect(center=(config.SCREEN_WIDTH//2, config.SCREEN_HEIGHT//2 - 90))
@@ -143,7 +155,7 @@ class Game:
     def _render_game_over(self):
         # Render the game over screen
         game_over_text = self.fonts["default"].render("Game Over", True, config.WHITE)
-        score_text = self.fonts["default"].render(f"Final Score: {self.score}", True, config.WHITE)
+        score_text = self.fonts["default"].render(f"Final Score: {self.left_score}", True, config.WHITE)
         restart_text = self.fonts["default"].render("Click to Restart", True, config.WHITE)
 
         game_over_rect = game_over_text.get_rect(center=(config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT // 2 - 40))
